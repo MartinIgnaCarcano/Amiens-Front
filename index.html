@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario V1</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Gestión de Inventario</h1>
+
+        <!-- Pestañas -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="productos">Productos</button>
+            <button class="tab-btn" data-tab="extracciones">Extracciones</button>
+        </div>
+
+        <!-- Pestaña Productos -->
+        <div id="productos-tab" class="tab-content active">
+            <section id="productos">
+                <div class="search-container">
+                    <input type="text" id="buscador-productos" placeholder="Buscar productos...">
+
+                    <select name="verificarStock" id="verificarStock">
+                        <option value="todos">Todos</option>
+                        <option value="sin-stock">Sin Stock</option>
+                        <option value="bajo-stock">Bajo Stock</option>
+                        <option value="en-stock">En Stock</option>
+                    </select>
+                    <button id="btn-nuevo-producto">
+                        <img src="img/plus.svg" alt="Nuevo Producto">
+                    </button>
+                </div>
+                <div class="tabla">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Proveedor</th>
+                                <th>Stock</th>
+                                <th>Stock Mínimo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-lista"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Pestaña Extracciones -->
+        <div id="extracciones-tab" class="tab-content">
+            <section id="extracciones">
+                <div class="search-container">
+                    <input type="text" id="buscador-extracciones" placeholder="Buscar extracciones...">
+                    <select name="filtroFecha" id="filtroFecha">
+                        <option value="todos">Todas las fechas</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="semana">Esta semana</option>
+                        <option value="mes">Este mes</option>
+                    </select>
+                    <button id="btn-nueva-extraccion">
+                        <img src="img/plus.svg" alt="Nueva Extracción">
+                    </button>
+                </div>
+                <div class="tabla">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Productos</th>
+                                <th>Total Items</th>
+                            </tr>
+                        </thead>
+                        <tbody id="extracciones-lista"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Modal Producto -->
+        <div id="producto-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2 id="modal-title">Nuevo Producto</h2>
+                <form id="producto-form">
+                    <input type="hidden" id="producto-id">
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">Stock Actual</label>
+                        <input type="number" id="stock" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock_minimo">Stock Mínimo</label>
+                        <input type="number" id="stock_minimo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="proveedor">Proveedor</label>
+                        <input type="text" id="proveedor">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <input type="text" id="categoria">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit">Guardar</button>
+                        <button type="button" id="cancelar-form">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Extracción -->
+        <div id="extraccion-modal" class="modal">
+            <div class="modal-content" style="width: 70%; max-width: 800px;">
+                <span class="close-modal">&times;</span>
+                <h2 id="modal-extraccion-title">Nueva Extracción</h2>
+
+                <div class="form-group">
+                    <label for="extraccion-descripcion">Descripción</label>
+                    <input type="text" id="extraccion-descripcion" required>
+                </div>
+
+                <div class="agregar-producto-container">
+                    <div class="search-container" style="margin: 15px 0;">
+                        <select id="producto-select" style="flex: 1;">
+                            <option value="">Seleccionar producto</option>
+                        </select>
+                        <input type="number" id="producto-cantidad" min="1" value="1" placeholder="Cantidad"
+                            style="width: 100px;">
+                        <button id="btn-agregar-producto">Agregar</button>
+                    </div>
+                </div>
+
+                <table style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productos-extraccion-lista"></tbody>
+                </table>
+
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="button" id="guardar-extraccion">Guardar</button>
+                    <button type="button" id="cancelar-extraccion">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

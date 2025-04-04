@@ -1,0 +1,276 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    margin: 0;
+    background-color: rgb(10, 10, 10);
+}
+
+.container {
+    max-width: 1250px;
+    margin: 0 auto;
+    color: white;
+    margin-bottom: 30px;
+}
+
+#productos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.productos-titulos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-container input {
+    width: 60%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+#verificarStock {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: rgb(20, 20, 20);
+    color: white;
+    border: 1px solid #ddd;
+}
+
+.search-container button {
+    background-color: rgb(10, 10, 10);
+    border: none;
+}
+
+.search-container img {
+    width: 40px;
+    height: 40px;
+}
+
+.search-container button:hover {
+    cursor: pointer;
+}
+
+.search-container select {
+    width: 15%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+/*---------------------*/
+/* TABLA */
+/*---------------------*/
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: rgb(50, 50, 50);
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: rgb(30, 30, 30);
+    cursor: pointer;
+}
+
+tr.clicked {
+    background-color: rgba(0, 120, 215, 0.1);
+    transition: background-color 0.3s;
+}
+
+/* Evita selección de texto durante doble click */
+tr {
+    user-select: none;
+}
+
+/* Mantener clases de estado */
+.sin-stock {
+    background-color: #e74c3c;
+}
+
+.bajo-stock {
+    background-color: #f39c12;
+}
+
+.en-stock {
+    background-color: #2ecc71;
+}
+
+/*---------------------*/
+/* FORMULARIO */
+/*---------------------*/
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: rgb(10, 10, 10);
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    max-width: 500px;
+}
+
+.close-modal {
+    float: right;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+#producto-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.form-group input {
+    width: 99%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 1em;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.form-actions button[type="button"] {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Sistema de pestañas */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    border-bottom-color: #4CAF50;
+    font-weight: bold;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Estilos específicos para extracciones */
+#extracciones table td:nth-child(3) {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*MODAL extracciones*/
+/* Estilos para el modal de extracción */
+.agregar-producto-container {
+    background-color: rgb(30, 30, 30);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+#btn-agregar-producto, #guardar-extraccion{
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#productos-extraccion-lista tr td:nth-child(2) {
+    text-align: center;
+}
+
+#productos-extraccion-lista tr td:nth-child(3) {
+    text-align: center;
+}
+
+#productos-extraccion-lista tr td:nth-child(4) {
+    text-align: center;
+}
+
+/* Estilo para productos sin stock suficiente */
+.sin-stock-suficiente {
+    color: #e74c3c;
+    font-weight: bold;
+}
