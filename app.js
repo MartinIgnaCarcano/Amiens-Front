@@ -150,10 +150,32 @@ async function guardarProducto(event) {
     }
 }
 
+async function eliminarProducto(event) {
+    event.preventDefault();
+    let productoId = document.getElementById('producto-id').value;
+    console.log(productoId);
+    if (confirm('¿Está seguro de que desea eliminar este producto?')) {
+        try {
+            await api.deleteProducto(productoId);
+        } catch (error) {
+            console.error('Error eliminando producto:', error);
+            alert('Error al eliminar el producto');
+        }
+    }
+    cerrarModal();
+    await loadProductos(); // Recargar la lista
+}
+
 // Función para cerrar el modal
 function cerrarModal() {
-    document.getElementById('producto-modal').style.display = 'none';
-    document.getElementById('producto-id').value = '';
+    if(currentTab === 'productos') {
+        document.getElementById('producto-modal').style.display = 'none';
+        document.getElementById('producto-id').value = '';
+    }else{
+        document.getElementById('extraccion-modal').style.display = 'none';
+        extraccionEditando = null;
+    }
+    
 }
 
 /*-----------------------*/
@@ -176,10 +198,7 @@ function filtrarExtracciones() {
 
     const filtradas = todasExtracciones.filter(e => {
         // Filtro por texto
-        const coincideTexto = e.descripcion.toLowerCase().includes(termino) ||
-            e.detalles.some(d =>
-                d.producto_descripcion.toLowerCase().includes(termino)
-            );
+        const coincideTexto = e.descripcion.toLowerCase().includes(termino)
 
         // Filtro por fecha
         const fechaExtraccion = new Date(e.fecha);
@@ -197,7 +216,7 @@ function filtrarExtracciones() {
 
         return coincideTexto && coincideFecha;
     });
-
+    console.log(filtradas);
     renderizarExtracciones(filtradas);
 }
 
@@ -209,11 +228,11 @@ function renderizarExtracciones(extracciones) {
         const row = document.createElement('tr');
         const fecha = new Date(extraccion.fecha).toLocaleDateString();
         const totalItems = extraccion.detalles.reduce((sum, d) => sum + d.cantidad, 0);
-
+        const productos = extraccion.detalles.map(d => todosProductos.find(p => p.id === d.producto_id)?.descripcion || `Producto ${d.producto_id}`).join(', ');
         row.innerHTML = `
             <td>${fecha}</td>
             <td>${extraccion.descripcion || 'Sin descripción'}</td>
-            <td>${extraccion.detalles.map(d => `${d.producto_descripcion} (${d.cantidad})`).join(', ')}</td>
+            <td>${productos}</td>
             <td>${totalItems}</td>
         `;
         tbody.appendChild(row);
@@ -233,6 +252,7 @@ async function abrirModalExtraccion(extraccion = null) {
     if (extraccion) {
         title.textContent = `Editar Extracción: ${extraccion.descripcion}`;
         document.getElementById('extraccion-descripcion').value = extraccion.descripcion;
+        document.getElementById('extraccion-id').value = extraccion.id;
         productosParaExtraccion = extraccion.detalles.map(d => ({
             producto_id: d.producto_id,
             cantidad: d.cantidad,
@@ -343,7 +363,7 @@ async function guardarExtraccion() {
             await api.createExtraccion(data);
         }
 
-        cerrarModalExtraccion();
+        cerrarModal();
         await loadExtracciones();
     } catch (error) {
         console.error('Error guardando extracción:', error);
@@ -351,10 +371,22 @@ async function guardarExtraccion() {
     }
 }
 
-// Cerrar modal
-function cerrarModalExtraccion() {
-    document.getElementById('extraccion-modal').style.display = 'none';
-    extraccionEditando = null;
+// Eliminar extracción (desde la lista principal)
+async function eliminarExtraccion(event) {
+    const extraccionId = document.getElementById('extraccion-id').value;
+    if (confirm('¿Está seguro de que desea eliminar esta extracción?')) {
+        try {
+            await api.deleteExtraccion(extraccionId);
+            await loadExtracciones(); // Recargar la lista
+            alert('Extracción eliminada correctamente');
+        } catch (error) {
+            console.error('Error eliminando extracción:', error);
+            alert('Error al eliminar la extracción: ' + (error.message || 'Intente nuevamente'));
+        }
+    }
+    cerrarModal();
+    await loadExtracciones(); // Recargar la lista
+
 }
 
 // Función para agregar producto
@@ -392,6 +424,7 @@ function agregarProductoAExtraccion() {
     select.value = '';
     cantidadInput.value = 1;
 }
+
 
 
 
@@ -442,10 +475,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //Cerrar al hacer clic fuera del modal
     window.addEventListener('click', (event) => {
         const modal = document.getElementById('producto-modal');
-        if (event.target === modal) {
+        if (event.target === modal ) {
+            cerrarModal();
+        }
+        const modalExtraccion = document.getElementById('extraccion-modal');
+        if (event.target === modalExtraccion) {
             cerrarModal();
         }
     });
+    document.getElementById('btn-eliminar-producto').addEventListener('click', eliminarProducto);
 
     /*-----------------*/
     //eventos EXTRACCIONES
@@ -462,7 +500,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-nueva-extraccion').addEventListener('click', () => abrirModalExtraccion());
     document.getElementById('btn-agregar-producto').addEventListener('click', agregarProductoAExtraccion);
     document.getElementById('guardar-extraccion').addEventListener('click', guardarExtraccion);
-    document.getElementById('cancelar-extraccion').addEventListener('click', cerrarModalExtraccion);
+    document.getElementById('cancelar-extraccion').addEventListener('click', cerrarModal);
+    document.getElementById("btn-eliminar-producto-extraccion").addEventListener('click', eliminarExtraccion);
+    document.getElementById('close-modal-extraccion').addEventListener('click', cerrarModal);
 
     // Para editar desde la lista principal (añadir en DOMContentLoaded)
     document.addEventListener('click', async (e) => {

@@ -35,7 +35,7 @@
                     </button>
                 </div>
                 <div class="tabla">
-                    <table>
+                    <table id="productos-table">
                         <thead>
                             <tr>
                                 <th>Descripción</th>
@@ -68,7 +68,7 @@
                     </button>
                 </div>
                 <div class="tabla">
-                    <table>
+                    <table id="extracciones-table">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -117,8 +117,11 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit">Guardar</button>
-                        <button type="button" id="cancelar-form">Cancelar</button>
+                        <button id="btn-eliminar-producto">Borrar</button>
+                        <div class="form-actions-btns">
+                            <button type="submit">Guardar</button>
+                            <button type="button" id="cancelar-form">Cancelar</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -127,8 +130,9 @@
         <!-- Modal Extracción -->
         <div id="extraccion-modal" class="modal">
             <div class="modal-content" style="width: 70%; max-width: 800px;">
-                <span class="close-modal">&times;</span>
+                <span id="close-modal-extraccion" class="close-modal">&times;</span>
                 <h2 id="modal-extraccion-title">Nueva Extracción</h2>
+                <input type="hidden" id="extraccion-id">
 
                 <div class="form-group">
                     <label for="extraccion-descripcion">Descripción</label>
@@ -137,7 +141,7 @@
 
                 <div class="agregar-producto-container">
                     <div class="search-container" style="margin: 15px 0;">
-                        <select id="producto-select" style="flex: 1;">
+                        <select id="producto-select" style="width: 60%;">
                             <option value="">Seleccionar producto</option>
                         </select>
                         <input type="number" id="producto-cantidad" min="1" value="1" placeholder="Cantidad"
@@ -146,21 +150,27 @@
                     </div>
                 </div>
 
-                <table style="margin-top: 20px;">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Stock</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productos-extraccion-lista"></tbody>
-                </table>
+                <div class="table-modal-extraccion">
+                    <table style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-extraccion-lista"></tbody>
+                    </table>
+                </div>
 
                 <div class="form-actions" style="margin-top: 20px;">
-                    <button type="button" id="guardar-extraccion">Guardar</button>
-                    <button type="button" id="cancelar-extraccion">Cancelar</button>
+                    <button id="btn-eliminar-producto-extraccion">Eliminar extraccion</button>
+                    <div class="form-actions-btns">
+                        <button type="button" id="guardar-extraccion">Guardar</button>
+                        <button type="button" id="cancelar-extraccion">Cancelar</button>
+                    </div>
+
                 </div>
             </div>
         </div>

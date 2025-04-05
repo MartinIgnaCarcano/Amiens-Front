@@ -31,6 +31,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .search-container input {
@@ -78,10 +79,17 @@ body {
 /*---------------------*/
 /* TABLA */
 /*---------------------*/
+#productos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+
 }
 
 th,
@@ -248,7 +256,13 @@ tr {
     margin-bottom: 15px;
 }
 
-#btn-agregar-producto, #guardar-extraccion{
+.table-modal-extraccion {
+    height: 30vh;
+    overflow-y: scroll;
+}
+
+#btn-agregar-producto,
+#guardar-extraccion {
     background-color: #4CAF50;
     color: white;
     padding: 10px 20px;
@@ -273,4 +287,94 @@ tr {
 .sin-stock-suficiente {
     color: #e74c3c;
     font-weight: bold;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* styles.css */
+/* Añadir al final del archivo */
+/* ==== EXTRACCIONES TAB ==== */
+
+#extracciones-tab {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+#extracciones-tab table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#extracciones-tab th,
+#extracciones-tab td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* ----------------------------------------- */
+/* Responsive para móviles (menos de 600px) */
+/* ----------------------------------------- */
+
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+        width: 99vw;
+    }
+
+    .container {
+        width: 100vw;
+        overflow-x: inherit;
+    }
+
+    #productos-table th:nth-child(2),
+    #productos-table th:nth-child(3),
+    #productos-table th:nth-child(5),
+    #productos-table td:nth-child(2),
+    #productos-table td:nth-child(3),
+    #productos-table td:nth-child(5),
+    #extracciones-table th:nth-child(4),
+    #extracciones-table td:nth-child(4) {
+        display: none;
+    }
+
+    #productos-tab,#extracciones-table {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    #productos-tab table,#extracciones-table table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    #productos-tab th,
+    #productos-tab td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    #modal-title,
+    .close-modal {
+        display: none;
+    }
+
+    .form-actions{
+        display: flex;
+        align-items: center;
+    }
+    .form-actions-btns{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    #btn-eliminar-producto{
+        height: fit-content;
+    }
+
 }
