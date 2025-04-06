@@ -9,7 +9,11 @@ let productosParaExtraccion = []; // Almacena productos seleccionados para la ex
 let extraccionEditando = null; // Almacena la extracción que se está editando
 let productoAgregar = null; // Almacena el producto seleccionado para agregar a la extracción
 
+
 let inputBuscador = document.getElementById('buscador-productos-extraccion');
+
+const searchInput = document.getElementById('search-input');
+const suggestionsList = document.getElementById('suggestions-list');
 
 // Sistema de pestañas
 function switchTab(tabName) {
@@ -424,13 +428,13 @@ async function guardarExtraccion() {
 async function eliminarExtraccion(event) {
     const extraccionId = document.getElementById('extraccion-id').value;
     if (confirm('¿Está seguro de que desea eliminar esta extracción?')) {
-        if(confirm('¿Quiere devolver los productos a stock?')) {
+        if (confirm('¿Quiere devolver los productos a stock?')) {
             data = { 'devolver': 1 };
-        }else{
+        } else {
             data = { 'devolver': 0 };
         }
         try {
-            await api.deleteExtraccion(extraccionId,data);
+            await api.deleteExtraccion(extraccionId, data);
             await loadExtracciones(); // Recargar la lista
             alert('Extracción eliminada correctamente');
         } catch (error) {
@@ -571,24 +575,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const searchInput = document.getElementById('search-input');
-    const suggestionsList = document.getElementById('suggestions-list');
-    
+
+
     // Cargar pestaña inicial
     switchTab('productos');
 
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
-    
+
         if (query === '') {
             suggestionsList.innerHTML = '';
             return;
         }
-    
+
         const filtered = todosProductos.filter(producto =>
             producto.descripcion.toLowerCase().includes(query)
         );
-    
+
         renderSuggestions(filtered);
     });
 });
@@ -612,7 +615,7 @@ function renderSuggestions(filteredProducts) {
             searchInput.value = producto.descripcion;
             suggestionsList.innerHTML = ''; // Oculta el dropdown
 
-            
+
             productoAgregar = producto; // Guardar el producto seleccionado
         });
 
