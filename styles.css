@@ -254,6 +254,8 @@ tr {
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 15px;
+    display: flex;
+    justify-content: space-around;
 }
 
 .table-modal-extraccion {
@@ -294,6 +296,13 @@ tr {
     justify-content: space-between;
 }
 
+.buscardor-producto-extraccion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 /* styles.css */
 /* Añadir al final del archivo */
 /* ==== EXTRACCIONES TAB ==== */
@@ -314,6 +323,7 @@ tr {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 /* ----------------------------------------- */
 /* Responsive para móviles (menos de 600px) */
 /* ----------------------------------------- */
@@ -340,12 +350,14 @@ tr {
         display: none;
     }
 
-    #productos-tab,#extracciones-table {
+    #productos-tab,
+    #extracciones-table {
         max-width: 100%;
         overflow-x: auto;
     }
 
-    #productos-tab table,#extracciones-table table {
+    #productos-tab table,
+    #extracciones-table table {
         table-layout: fixed;
         width: 100%;
     }
@@ -363,18 +375,61 @@ tr {
         display: none;
     }
 
-    .form-actions{
+    .form-actions {
         display: flex;
         align-items: center;
     }
-    .form-actions-btns{
+
+    .form-actions-btns {
         width: 100%;
         display: flex;
         flex-direction: column;
         gap: 20px;
     }
-    #btn-eliminar-producto{
+
+    #btn-eliminar-producto {
         height: fit-content;
     }
 
+    
+    #producto-cantidad{
+        width: 30px;
+    }
+    #btn-agregar-producto{
+        width: fit-content;
+        padding: 10px 5px;
+    }
+}
+
+#search-container {
+    position: relative;
+    width: 100%;
+}
+
+#search-input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+    background: rgb(10, 10, 10);
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+#suggestions-list li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#suggestions-list li:hover {
+    background: black;
 }

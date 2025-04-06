@@ -7,6 +7,8 @@ let currentTab = 'productos'; // Pestaña activa
 let productosParaExtraccion = []; // Almacena productos seleccionados para la extracción
 let extraccionEditando = null; // Almacena la extracción que se está editando
 
+let inputBuscador = document.getElementById('buscador-productos-extraccion');
+
 // Sistema de pestañas
 function switchTab(tabName) {
     currentTab = tabName;
@@ -26,10 +28,19 @@ function switchTab(tabName) {
 async function loadProductos() {
     try {
         todosProductos = await api.fetchProductos();
+        todosProductos = ordenarProductosPorDescripcion(); // Ordenar productos por descripción
         renderizarProductos(todosProductos);
     } catch (error) {
         console.error('Error cargando productos:', error);
     }
+}
+
+function ordenarProductosPorDescripcion() {
+    return todosProductos.sort((a, b) => {
+        const descA = a.descripcion.toLowerCase();
+        const descB = b.descripcion.toLowerCase();
+        return descA.localeCompare(descB);
+    });
 }
 
 function renderizarProductos(productos) {
@@ -53,6 +64,44 @@ function renderizarProductos(productos) {
         row.addEventListener('click', () => prepararEdicion(producto));
     });
 }
+
+function filtrarProductosExtracion() {
+    const termino = document.getElementById('buscador-productos-extraccion').value.toLowerCase();
+    const filtrados = todosProductos.filter(p => {
+        // Filtro por texto de búsqueda
+        const coincideTexto =
+            p.descripcion.toLowerCase().includes(termino) ||
+            (p.categoria && p.categoria.toLowerCase().includes(termino)) ||
+            (p.proveedor && p.proveedor.toLowerCase().includes(termino));
+
+        // Filtro por estado
+        const coincideEstado =
+            estadoSeleccionado === 'todos' ||
+            (p.estado && p.estado.toLowerCase().replace(' ', '-') === estadoSeleccionado);
+
+        return coincideTexto && coincideEstado;
+    });
+    renderizarProductosExtraccion(filtrados);
+}
+
+function renderizarProductosExtraccion(productos) {
+    const listaResultados = document.getElementById('resultados-productos-extraccion');
+
+    productos.forEach(producto => {
+        const li = document.createElement('li');
+        li.textContent = producto.nombre;
+
+        li.addEventListener('click', () => {
+            inputBuscador.value = producto.nombre;
+            listaResultados.innerHTML = ''; // Oculta los resultados
+            // 👇 Llamá tu función acá
+            productoAgregar = producto; // Guardar el producto seleccionado
+        });
+
+        listaResultados.appendChild(li);
+    });
+}
+
 
 function filtrarProductos() {
     const termino = document.getElementById('buscador-productos').value.toLowerCase();
@@ -168,14 +217,14 @@ async function eliminarProducto(event) {
 
 // Función para cerrar el modal
 function cerrarModal() {
-    if(currentTab === 'productos') {
+    if (currentTab === 'productos') {
         document.getElementById('producto-modal').style.display = 'none';
         document.getElementById('producto-id').value = '';
-    }else{
+    } else {
         document.getElementById('extraccion-modal').style.display = 'none';
         extraccionEditando = null;
     }
-    
+
 }
 
 /*-----------------------*/
@@ -246,12 +295,11 @@ async function abrirModalExtraccion(extraccion = null) {
     const modal = document.getElementById('extraccion-modal');
     const title = document.getElementById('modal-extraccion-title');
 
-    // Cargar productos en el select
-    await cargarProductosParaSelect();
 
     if (extraccion) {
-        title.textContent = `Editar Extracción: ${extraccion.descripcion}`;
-        document.getElementById('extraccion-descripcion').value = extraccion.descripcion;
+        title.textContent = `Extracción: ${extraccion.descripcion}`;
+        document.getElementById('extraccion-descripcion-container').style.display = 'none';
+        document.getElementById('agregar-producto-container').style.display = 'none';
         document.getElementById('extraccion-id').value = extraccion.id;
         productosParaExtraccion = extraccion.detalles.map(d => ({
             producto_id: d.producto_id,
@@ -259,8 +307,14 @@ async function abrirModalExtraccion(extraccion = null) {
             producto_descripcion: d.producto_descripcion || `Producto ${d.producto_id}`,
             stock: d.producto_stock || 0
         }));
+        document.getElementById('acciones-header').style.display = 'none';
+        document.getElementById('guardar-extraccion').style.display = 'none';
     } else {
         title.textContent = 'Nueva Extracción';
+        document.getElementById('extraccion-descripcion-container').style.display = 'block';
+        document.getElementById('agregar-producto-container').style.display = 'block';
+        document.getElementById('acciones-header').style.display = 'block';
+        document.getElementById('guardar-extraccion').style.display = 'block';
         document.getElementById('extraccion-descripcion').value = '';
         productosParaExtraccion = [];
     }
@@ -269,20 +323,7 @@ async function abrirModalExtraccion(extraccion = null) {
     modal.style.display = 'block';
 }
 
-// Cargar productos en el select
-async function cargarProductosParaSelect() {
-    const select = document.getElementById('producto-select');
-    select.innerHTML = '<option value="">Seleccionar producto</option>';
 
-    const productos = await api.fetchProductos();
-    productos.forEach(p => {
-        const option = document.createElement('option');
-        option.value = p.id;
-        option.textContent = `${p.descripcion} (Stock: ${p.stock})`;
-        option.dataset.stock = p.stock;
-        select.appendChild(option);
-    });
-}
 
 // Renderizar productos en la tabla
 function renderizarProductosEnExtraccion() {
@@ -293,17 +334,23 @@ function renderizarProductosEnExtraccion() {
         const producto = todosProductos.find(p => p.id === item.producto_id) || {};
         const tr = document.createElement('tr');
         const sinStock = producto.stock < item.cantidad;
-        console.log(producto.descripcion);
+
+        const accionesHTML = extraccionEditando
+            ? '' // Si estás editando, no mostramos acciones
+            : `
+                <td>
+                    <button class="btn-eliminar-producto" data-id="${item.producto_id}">Eliminar</button>
+                    <button class="btn-editar-cantidad" data-id="${item.producto_id}">Editar</button>
+                </td>
+            `;
+
         tr.innerHTML = `
             <td>${producto.descripcion}</td>
             <td>${item.cantidad}</td>
             <td class="${sinStock ? 'sin-stock-suficiente' : ''}">
                 ${producto.stock !== undefined ? producto.stock : 'N/A'}
             </td>
-            <td>
-                <button class="btn-eliminar-producto" data-id="${item.producto_id}">Eliminar</button>
-                <button class="btn-editar-cantidad" data-id="${item.producto_id}">Editar</button>
-            </td>
+            ${accionesHTML}
         `;
 
         tbody.appendChild(tr);
@@ -375,8 +422,13 @@ async function guardarExtraccion() {
 async function eliminarExtraccion(event) {
     const extraccionId = document.getElementById('extraccion-id').value;
     if (confirm('¿Está seguro de que desea eliminar esta extracción?')) {
+        if(confirm('¿Quiere devolver los productos a stock?')) {
+            data = { 'devolver': 1 };
+        }else{
+            data = { 'devolver': 0 };
+        }
         try {
-            await api.deleteExtraccion(extraccionId);
+            await api.deleteExtraccion(extraccionId,data);
             await loadExtracciones(); // Recargar la lista
             alert('Extracción eliminada correctamente');
         } catch (error) {
@@ -391,10 +443,9 @@ async function eliminarExtraccion(event) {
 
 // Función para agregar producto
 function agregarProductoAExtraccion() {
-    const select = document.getElementById('producto-select');
+    const input = document.getElementById('search-input');
     const cantidadInput = document.getElementById('producto-cantidad');
-
-    const productoId = parseInt(select.value);
+    const productoId = productoAgregar.id; // Asumiendo que productoAgregar es el objeto del producto seleccionado
     const cantidad = parseInt(cantidadInput.value);
 
     if (!productoId || isNaN(cantidad) || cantidad <= 0) {
@@ -421,14 +472,9 @@ function agregarProductoAExtraccion() {
     }
 
     renderizarProductosEnExtraccion();
-    select.value = '';
+    input.value = '';
     cantidadInput.value = 1;
 }
-
-
-
-
-
 
 
 
@@ -475,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //Cerrar al hacer clic fuera del modal
     window.addEventListener('click', (event) => {
         const modal = document.getElementById('producto-modal');
-        if (event.target === modal ) {
+        if (event.target === modal) {
             cerrarModal();
         }
         const modalExtraccion = document.getElementById('extraccion-modal');
@@ -527,3 +573,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar pestaña inicial
     switchTab('productos');
 });
+
+
+const searchInput = document.getElementById('search-input');
+const suggestionsList = document.getElementById('suggestions-list');
+let productoAgregar = null;
+
+// Ejemplo de array de productos. En tu caso, lo obtendrías desde la API o tu fuente de datos.
+
+
+// Función para renderizar las sugerencias filtradas
+function renderSuggestions(filteredProducts) {
+    suggestionsList.innerHTML = '';
+
+    filteredProducts.forEach(producto => {
+        const li = document.createElement('li');
+        li.textContent = producto.descripcion;
+
+        // Al hacer click se completa el input y se ejecuta la acción deseada
+        li.addEventListener('click', () => {
+            searchInput.value = producto.descripcion;
+            suggestionsList.innerHTML = ''; // Oculta el dropdown
+
+            
+            productoAgregar = producto; // Guardar el producto seleccionado
+        });
+
+        suggestionsList.appendChild(li);
+    });
+}
+
+// Evento para filtrar a medida que el usuario escribe
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+
+    if (query === '') {
+        suggestionsList.innerHTML = '';
+        return;
+    }
+
+    const filtered = todosProductos.filter(producto =>
+        producto.descripcion.toLowerCase().includes(query)
+    );
+
+    renderSuggestions(filtered);
+});
+
+// Función que se ejecuta al seleccionar un producto
+

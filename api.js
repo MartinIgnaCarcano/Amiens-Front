@@ -77,10 +77,12 @@ const api = {
         }
     },
 
-    deleteExtraccion: async (id) => {
+    deleteExtraccion: async (id, data = {}) => {
         try {
             const response = await fetch(`${API_URL}/extracciones/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             });
             return await response.json();
         } catch (error) {
@@ -98,7 +100,7 @@ window.api = api;
 2 HACER QUE EL SELECT DEL MODAL DE ME DEJE ESCRIBIR EN EL
 --HECHO-- 3 ARREGLAR EL MODAL DE EXTRACCIONES QUE NO SE CERRABA AL HACER CLICK FUERA 
 --hecho-- 4 HACER QUE EL MODAL DE EXTRACCIONES SE CERRARA AL HACER CLICK EN LA X
-5 ACHICAR LAS TABLAS PARA CELULAR
+--hecho--5 ACHICAR LAS TABLAS PARA CELULAR
 --hecho--6 AGREGAR EL BOTON DE ELIMINAR TANTO A LOS PRODUCTOS COMO A LAS EXTRACCIONES
 7 FOMULARIO LOGIN Y DAR ROLES A LOS USUARIOS
 8 Update extraccion

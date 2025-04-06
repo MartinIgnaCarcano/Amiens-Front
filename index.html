@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario V1</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -22,7 +25,7 @@
         <div id="productos-tab" class="tab-content active">
             <section id="productos">
                 <div class="search-container">
-                    <input type="text" id="buscador-productos" placeholder="Buscar productos...">
+                    <input type="text" id="buscador-productos" placeholder="Buscar productos..." autocomplete="off">
 
                     <select name="verificarStock" id="verificarStock">
                         <option value="todos">Todos</option>
@@ -56,7 +59,7 @@
         <div id="extracciones-tab" class="tab-content">
             <section id="extracciones">
                 <div class="search-container">
-                    <input type="text" id="buscador-extracciones" placeholder="Buscar extracciones...">
+                    <input type="text" id="buscador-extracciones" placeholder="Buscar extracciones..." autocomplete="off">
                     <select name="filtroFecha" id="filtroFecha">
                         <option value="todos">Todas las fechas</option>
                         <option value="hoy">Hoy</option>
@@ -89,31 +92,31 @@
                 <span class="close-modal">&times;</span>
                 <h2 id="modal-title">Nuevo Producto</h2>
                 <form id="producto-form">
-                    <input type="hidden" id="producto-id">
+                    <input type="hidden" id="producto-id" autocomplete="off">
 
                     <div class="form-group">
                         <label for="descripcion">Descripción</label>
-                        <input type="text" id="descripcion" required>
+                        <input type="text" id="descripcion" required autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="stock">Stock Actual</label>
-                        <input type="number" id="stock" required>
+                        <input type="number" id="stock" required autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="stock_minimo">Stock Mínimo</label>
-                        <input type="number" id="stock_minimo" required>
+                        <input type="number" id="stock_minimo" required autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="proveedor">Proveedor</label>
-                        <input type="text" id="proveedor">
+                        <input type="text" id="proveedor" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="categoria">Categoría</label>
-                        <input type="text" id="categoria">
+                        <input type="text" id="categoria" autocomplete="off">
                     </div>
 
                     <div class="form-actions">
@@ -132,20 +135,21 @@
             <div class="modal-content" style="width: 70%; max-width: 800px;">
                 <span id="close-modal-extraccion" class="close-modal">&times;</span>
                 <h2 id="modal-extraccion-title">Nueva Extracción</h2>
-                <input type="hidden" id="extraccion-id">
+                <input type="hidden" id="extraccion-id" autocomplete="off">
 
-                <div class="form-group">
+                <div class="form-group" id="extraccion-descripcion-container">
                     <label for="extraccion-descripcion">Descripción</label>
-                    <input type="text" id="extraccion-descripcion" required>
+                    <input type="text" id="extraccion-descripcion" required autocomplete="off">
                 </div>
 
-                <div class="agregar-producto-container">
+                <div class="agregar-producto-container" id="agregar-producto-container">
                     <div class="search-container" style="margin: 15px 0;">
-                        <select id="producto-select" style="width: 60%;">
-                            <option value="">Seleccionar producto</option>
-                        </select>
-                        <input type="number" id="producto-cantidad" min="1" value="1" placeholder="Cantidad"
-                            style="width: 100px;">
+                        <div id="search-container">
+                            <input type="text" id="search-input" placeholder="Buscar producto..." autocomplete="off">
+                            <ul id="suggestions-list"></ul>
+                          </div>
+                          
+                        <input type="number" id="producto-cantidad" min="1" value="1" placeholder="Cantidad" autocomplete="off">
                         <button id="btn-agregar-producto">Agregar</button>
                     </div>
                 </div>
@@ -157,7 +161,7 @@
                                 <th>Producto</th>
                                 <th>Cantidad</th>
                                 <th>Stock</th>
-                                <th>Acciones</th>
+                                <th id="acciones-header">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="productos-extraccion-lista"></tbody>
@@ -175,6 +179,12 @@
             </div>
         </div>
     </div>
+
+    <!--SCRIPTS-->
+    <!-- jQuery (Select2 lo necesita) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script src="api.js"></script>
     <script src="app.js"></script>
