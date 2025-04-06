@@ -13,7 +13,7 @@ let productoAgregar = null; // Almacena el producto seleccionado para agregar a 
 let inputBuscador = document.getElementById('buscador-productos-extraccion');
 
 const searchInput = document.getElementById('search-input');
-const suggestionsList = document.getElementById('suggestions-list');
+
 
 // Sistema de pestañas
 function switchTab(tabName) {
@@ -584,6 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput.value.toLowerCase().trim();
 
         if (query === '') {
+            const suggestionsList = document.getElementById('suggestions-list');
             suggestionsList.innerHTML = '';
             return;
         }
@@ -604,6 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Función para renderizar las sugerencias filtradas
 function renderSuggestions(filteredProducts) {
+    const suggestionsList = document.getElementById('suggestions-list');
     suggestionsList.innerHTML = '';
 
     filteredProducts.forEach(producto => {
