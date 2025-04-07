@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://amiens-back.onrender.com';
 
 const api = {
     // Funciones de productos (existente)
