@@ -331,6 +331,10 @@ tr {
     gap: 20px;
 }
 
+#btn-eliminar-producto-extraccion, #btn-eliminar-producto{
+    height: 40px;
+}
+
 /* ----------------------------------------- */
 /* Responsive para móviles (menos de 600px) */
 /* ----------------------------------------- */
@@ -389,9 +393,6 @@ tr {
 
     .form-actions-btns {
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
     }
 
     #btn-eliminar-producto {
