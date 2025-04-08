@@ -324,6 +324,13 @@ tr {
     white-space: nowrap;
 }
 
+.form-actions-btns {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 /* ----------------------------------------- */
 /* Responsive para móviles (menos de 600px) */
 /* ----------------------------------------- */
