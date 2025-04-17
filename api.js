@@ -1,4 +1,4 @@
-const API_URL = 'https://amiens-back.onrender.com';
+const API_URL = 'https://amiens-temporal.onrender.com';
 
 const api = {
     // Funciones de productos (existente)
