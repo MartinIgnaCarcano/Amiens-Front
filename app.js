@@ -24,11 +24,20 @@ const suggestionsContainer = document.getElementById('suggestions-container');
 async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    const error = document.getElementById('error-text');
     try {
         const data = await api.login(username, password);
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('main-container').style.display = 'flex';
-        switchTab('productos');
+        if(!data){
+            errorMessage.style.display = 'block';
+            error.textContent = 'Usuario o contraseña incorrectos';
+            username.value = '';
+            password.value = '';
+        }else{
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('main-container').style.display = 'flex';
+            switchTab('productos');
+        }
     } catch (error) {
         alert(error.message);
     }
@@ -36,7 +45,6 @@ async function login() {
 }
 
 function logout() {
-    console.log('Cerrando sesión...');
     localStorage.removeItem('usuario')
     document.getElementById('login-form').style.display = 'flex';
     document.getElementById('main-container').style.display = 'none';
@@ -300,7 +308,6 @@ async function guardarProducto(event) {
 async function eliminarProducto(event) {
     event.preventDefault();
     let productoId = document.getElementById('producto-id').value;
-    console.log(productoId);
     if (confirm('¿Está seguro de que desea eliminar este producto?')) {
         try {
             await api.deleteProducto(productoId);
@@ -336,10 +343,8 @@ async function loadExtracciones() {
     mostrarSpinner();
     try {
         todasExtracciones = await api.fetchExtracciones();
-        console.log(todasExtracciones);
         usuarios = await api.getUsuarios();
         renderizarExtracciones(todasExtracciones);
-
     } catch (error) {
         console.error('Error cargando extracciones:', error);
     } finally {
@@ -399,7 +404,6 @@ function renderizarExtracciones(extracciones) {
         const totalItems = extraccion.detalles.reduce((sum, d) => sum + d.cantidad, 0);
         const productos = extraccion.detalles.map(d => todosProductos.find(p => p.id === d.producto_id)?.descripcion || `Producto ${d.producto_id}`).join(', ');
         const usuario = usuarios.find(u => u.id == extraccion.usuario_id);
-        console.log(usuario);
         const nombreUsuario = usuario ? `${usuario.username}` : 'N/A';
         row.innerHTML = `
             <td>${fecha}</td>

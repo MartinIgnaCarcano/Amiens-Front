@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000'; // Cambia esto por la URL de tu API si es diferente
+const API_URL = 'https://amiens-back-1.onrender.com'; // Cambia esto por la URL de tu API si es diferente
 
 const api = {
 
@@ -14,10 +14,11 @@ const api = {
 
             if (!response.ok) {
                 throw new Error('Credenciales incorrectas');
+            }else{
+                const data = await response.json();
+                localStorage.setItem('usuario', data.usuario_id); // Almacena el token en localStorage
+                return data;
             }
-
-            const data = await response.json();
-            localStorage.setItem('usuario', data.usuario_id); // Almacena el token en localStorage
             // Podés almacenar el ID en localStorage si lo necesitás
             // localStorage.setItem('usuario_id', data.usuario_id);
         } catch (error) {
