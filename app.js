@@ -21,25 +21,65 @@ let inputBuscador = document.getElementById('buscador-productos-extraccion');
 const searchInput = document.getElementById('search-input');
 const suggestionsContainer = document.getElementById('suggestions-container');
 
+async function isLoggedIn() {
+    try {
+        const isLoggedIn = await api.verifyToken();
+        if (isLoggedIn) {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('main-container').style.display = 'flex';
+            switchTab('productos');
+        } else {
+            localStorage.removeItem('token'); // Limpiar token inválido si existe
+            logout();
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        localStorage.removeItem('token');
+    }
+}
+
 async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    const error = document.getElementById('error-text');
+    const boton = document.getElementById('btn-iniciar-sesion');
     try {
+        boton.disabled = true;
+        boton.textContent = 'Iniciando sesión...';
+        boton.style.cursor = 'not-allowed';
+        boton.style.backgroundColor = '#ccc';
         const data = await api.login(username, password);
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('main-container').style.display = 'flex';
-        switchTab('productos');
+        if (!data) {
+            errorMessage.style.display = 'block';
+            error.textContent = 'Usuario o contraseña incorrectos';
+            username.value = '';
+            password.value = '';
+            boton.disabled = false;
+            boton.textContent = 'Iniciar sesión';
+            boton.style.cursor = 'pointer';
+            boton.style.backgroundColor = '#3498db';
+        } else {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('main-container').style.display = 'flex';
+            switchTab('productos');
+        }
     } catch (error) {
         alert(error.message);
     }
-
 }
 
 function logout() {
-    console.log('Cerrando sesión...');
-    localStorage.removeItem('usuario')
+    const boton = document.getElementById('btn-iniciar-sesion');
+    boton.disabled = false;
+    boton.textContent = 'Iniciar sesión';
+    boton.style.cursor = 'pointer';
+    boton.style.backgroundColor = '#3498db';
+    localStorage.removeItem('token')
     document.getElementById('login-form').style.display = 'flex';
     document.getElementById('main-container').style.display = 'none';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 }
 
 
@@ -300,7 +340,6 @@ async function guardarProducto(event) {
 async function eliminarProducto(event) {
     event.preventDefault();
     let productoId = document.getElementById('producto-id').value;
-    console.log(productoId);
     if (confirm('¿Está seguro de que desea eliminar este producto?')) {
         try {
             await api.deleteProducto(productoId);
@@ -336,10 +375,8 @@ async function loadExtracciones() {
     mostrarSpinner();
     try {
         todasExtracciones = await api.fetchExtracciones();
-        console.log(todasExtracciones);
         usuarios = await api.getUsuarios();
         renderizarExtracciones(todasExtracciones);
-
     } catch (error) {
         console.error('Error cargando extracciones:', error);
     } finally {
@@ -399,7 +436,6 @@ function renderizarExtracciones(extracciones) {
         const totalItems = extraccion.detalles.reduce((sum, d) => sum + d.cantidad, 0);
         const productos = extraccion.detalles.map(d => todosProductos.find(p => p.id === d.producto_id)?.descripcion || `Producto ${d.producto_id}`).join(', ');
         const usuario = usuarios.find(u => u.id == extraccion.usuario_id);
-        console.log(usuario);
         const nombreUsuario = usuario ? `${usuario.username}` : 'N/A';
         row.innerHTML = `
             <td>${fecha}</td>
@@ -525,7 +561,6 @@ async function guardarExtraccion() {
 
     const data = {
         descripcion,
-        usuario_id: localStorage.getItem('usuario'),
         productos: productosParaExtraccion.map(p => ({
             producto_id: p.producto_id,
             cantidad: p.cantidad
@@ -533,12 +568,7 @@ async function guardarExtraccion() {
     };
 
     try {
-        if (extraccionEditando) {
-            await api.updateExtraccion(extraccionEditando.id, data);
-        } else {
-            await api.createExtraccion(data);
-        }
-
+        await api.createExtraccion(data);
         cerrarModal();
         await loadExtracciones();
     } catch (error) {
@@ -564,9 +594,9 @@ async function eliminarExtraccion(event) {
             console.error('Error eliminando extracción:', error);
             alert('Error al eliminar la extracción: ' + (error.message || 'Intente nuevamente'));
         }
+        cerrarModal();
+        await loadExtracciones(); // Recargar la lista
     }
-    cerrarModal();
-    await loadExtracciones(); // Recargar la lista
 
 }
 
@@ -838,7 +868,6 @@ async function guardarIngreso() {
     }
 
     const data = {
-        usuario_id: localStorage.getItem('usuario'),
         detalles: productosParaIngreso
     };
 
@@ -867,9 +896,9 @@ async function eliminarIngreso() {
             console.error('Error eliminando ingreso:', error);
             alert('Error al eliminar el ingreso: ' + (error.message || 'Intente nuevamente'));
         }
+        await loadIngresos();
+        cerrarModal();
     }
-    await loadIngresos();
-    cerrarModal();
 }
 
 function showSuggestionsForIngreso(products) {
@@ -900,6 +929,8 @@ function showSuggestionsForIngreso(products) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+
+    isLoggedIn();
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();

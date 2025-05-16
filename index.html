@@ -14,10 +14,15 @@
 
 <body>
     <form id="login-form">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Usuario" required />
-        <input type="password" id="password" placeholder="Contraseña" required />
-        <button type="submit">Iniciar sesión</button>
+        <div class="login-container">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Usuario" autocomplete="off" required />
+            <input type="password" id="password" placeholder="Contraseña" autocomplete="off" required />
+            <button type="submit" id="btn-iniciar-sesion">Iniciar sesión</button>
+            <div id="error-message" class="error-message" style="display: none">
+                <p id="error-text"></p>
+            </div>
+        </div>
     </form>
     <div class="container" id="main-container" style="display: none">
         <!-- Pestañas -->
@@ -26,7 +31,8 @@
             <button class="tab-btn active" data-tab="productos"><i class="fas fa-box"></i> Productos</button>
             <button class="tab-btn" data-tab="extracciones"><i class="fas fa-arrow-down"></i> Extracciones</button>
             <button class="tab-btn" data-tab="ingresos"><i class="fas fa-arrow-up"></i> Ingresos</button>
-            <button class="tab-btn" id="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+            <button class="tab-btn" id="btn-logout"><i class="fas fa-sign-out-alt"></i> <span>Cerrar
+                    sesión</span></button>
         </div>
 
         <div class="pantalla">

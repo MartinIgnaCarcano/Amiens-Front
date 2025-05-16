@@ -1,6 +1,32 @@
 const API_URL = 'http://localhost:5000'; // Cambia esto por la URL de tu API si es diferente
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+};
+
 const api = {
+
+    verifyToken: async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return false;
+
+            const response = await fetch(`${API_URL}/islogged`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+            console.log('Response from /islogged:', response);
+
+            return response.ok;
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            return false;
+        }
+    },
 
     login: async (username, password) => {
         try {
@@ -14,10 +40,11 @@ const api = {
 
             if (!response.ok) {
                 throw new Error('Credenciales incorrectas');
+            } else {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token); // Almacena el token en localStorage
+                return data;
             }
-
-            const data = await response.json();
-            localStorage.setItem('usuario', data.usuario_id); // Almacena el token en localStorage
             // Podés almacenar el ID en localStorage si lo necesitás
             // localStorage.setItem('usuario_id', data.usuario_id);
         } catch (error) {
@@ -28,7 +55,10 @@ const api = {
     // Funciones de productos (existente)
     fetchProductos: async () => {
         try {
-            const response = await fetch(`${API_URL}/productos`);
+            const response = await fetch(`${API_URL}/productos`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
             return await response.json();
         } catch (error) {
             console.error('Error fetching productos:', error);
@@ -40,9 +70,10 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/productos`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
+            console.log('Response from createProducto:', response);
             return await response.json();
         } catch (error) {
             console.error('Error creating producto:', error);
@@ -54,7 +85,7 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/productos/${id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
             return await response.json();
@@ -67,7 +98,8 @@ const api = {
     deleteProducto: async (id) => {
         try {
             const response = await fetch(`${API_URL}/productos/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: getAuthHeaders()
             });
             return await response.json();
         } catch (error) {
@@ -79,7 +111,12 @@ const api = {
     // Nuevas funciones para extracciones
     fetchExtracciones: async () => {
         try {
-            const response = await fetch(`${API_URL}/extracciones?_embed=detalles`);
+            const response = await fetch(`${API_URL}/extracciones?_embed=detalles`,
+                {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                }
+            );
             return await response.json();
         } catch (error) {
             console.error('Error fetching extracciones:', error);
@@ -91,7 +128,7 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/extracciones`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
             return await response.json();
@@ -105,7 +142,7 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/extracciones/${id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
             return await response.json();
@@ -118,7 +155,12 @@ const api = {
     // Funciones para ingresos
     fetchIngresos: async () => {
         try {
-            const response = await fetch(`${API_URL}/ingresos`);
+            const response = await fetch(`${API_URL}/ingresos`,
+                {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                }
+            );
             return await response.json();
         } catch (error) {
             console.error('Error fetching ingresos:', error);
@@ -130,7 +172,7 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/ingresos`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
             return await response.json();
@@ -144,7 +186,7 @@ const api = {
         try {
             const response = await fetch(`${API_URL}/ingresos/${id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
             return await response.json();
@@ -154,23 +196,14 @@ const api = {
         }
     },
 
-    updateIngreso: async (id, data) => {
-        try {
-            const response = await fetch(`${API_URL}/ingresos/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('Error updating ingreso:', error);
-            throw error;
-        }
-    },
-
     getUsuarios: async () => {
         try {
-            const response = await fetch(`${API_URL}/usuarios`);
+            const response = await fetch(`${API_URL}/usuarios`,
+                {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                }
+            );
             return await response.json();
         } catch (error) {
             console.error('Error fetching usuarios:', error);
