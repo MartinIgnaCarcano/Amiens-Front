@@ -8,6 +8,22 @@ const getAuthHeaders = () => {
     };
 };
 
+async function handleApiResponse(response) {
+    const data = await response.json();
+    
+    if (data.error === "El token ha expirado") {
+        showToast(data.mensaje || 'La sesión ha expirado', 'error');
+        cerrarSesion();
+        throw new Error('Token expirado'); // Para detener la ejecución
+    }
+    
+    if (!response.ok) {
+        throw new Error(data.message || 'Error en la solicitud');
+    }
+    
+    return data;
+};
+
 const api = {
 
     verifyToken: async () => {
@@ -59,7 +75,7 @@ const api = {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error fetching productos:', error);
             throw error;
@@ -73,8 +89,8 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            console.log('Response from createProducto:', response);
-            return await response.json();
+            
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error creating producto:', error);
             throw error;
@@ -88,7 +104,7 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error updating producto:', error);
             throw error;
@@ -101,7 +117,7 @@ const api = {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error deleting producto:', error);
             throw error;
@@ -117,7 +133,7 @@ const api = {
                     headers: getAuthHeaders()
                 }
             );
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error fetching extracciones:', error);
             throw error;
@@ -131,7 +147,7 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error creating extraccion:', error);
             throw error;
@@ -145,7 +161,7 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error deleting extraccion:', error);
             throw error;
@@ -161,7 +177,7 @@ const api = {
                     headers: getAuthHeaders()
                 }
             );
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error fetching ingresos:', error);
             throw error;
@@ -175,7 +191,7 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error creating ingreso:', error);
             throw error;
@@ -189,7 +205,7 @@ const api = {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error deleting ingreso:', error);
             throw error;
@@ -204,12 +220,25 @@ const api = {
                     headers: getAuthHeaders()
                 }
             );
-            return await response.json();
+            return await handleApiResponse(response);
         } catch (error) {
             console.error('Error fetching usuarios:', error);
             throw error;
         }
     }
+};
+
+window.cerrarSesion = () => {
+    const boton = document.getElementById('btn-iniciar-sesion');
+    boton.disabled = false;
+    boton.textContent = 'Iniciar sesión';
+    boton.style.cursor = 'pointer';
+    boton.style.backgroundColor = '#3498db';
+    localStorage.removeItem('token')
+    document.getElementById('login-form').style.display = 'flex';
+    document.getElementById('main-container').style.display = 'none';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 };
 
 window.api = api;

@@ -634,7 +634,9 @@ tr {
     }
 
     .table-modal-extraccion table th:nth-child(3),
-    .table-modal-extraccion table td:nth-child(3){
+    .table-modal-extraccion table td:nth-child(3),
+    .table-modal-ingreso table th:nth-child(3),
+    .table-modal-ingreso table td:nth-child(3) {
         display: none;
     }
 
@@ -646,7 +648,8 @@ tr {
     }
 
     #productos-tab table,
-    #extracciones-table table {
+    #extracciones-table table,
+    #ingresos-table table {
         table-layout: fixed;
         width: 100%;
     }

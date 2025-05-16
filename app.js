@@ -65,7 +65,7 @@ async function login() {
             switchTab('productos');
         }
     } catch (error) {
-        alert(error.message);
+        console.log(error.message);
     }
 }
 
@@ -137,6 +137,7 @@ function deshabilitarBotonesModal(modalId) {
     const buttons = modal.querySelectorAll('submit, button, input[type="sumbit"]');
     buttons.forEach(button => {
         button.disabled = true;
+        button.style.cursor = 'not-allowed';
     });
 }
 
@@ -145,6 +146,7 @@ function habilitarBotonesModal(modalId) {
     const buttons = modal.querySelectorAll('button');
     buttons.forEach(button => {
         button.disabled = false;
+        button.style.cursor = 'pointer';
     });
 }
 
@@ -326,12 +328,12 @@ async function guardarProducto(event) {
             };
             await api.createProducto(productoDataSinID);
         }
-
+        showToast('Producto guardado correctamente', 'success');
         cerrarModal();
         await loadProductos(); // Recargar la lista
     } catch (error) {
         console.error('Error guardando producto:', error);
-        alert('Error al guardar el producto');
+        showToast('Error al guardar el producto', 'error');
     } finally {
         habilitarBotonesModal('producto-modal');
     }
@@ -343,13 +345,14 @@ async function eliminarProducto(event) {
     if (confirm('¿Está seguro de que desea eliminar este producto?')) {
         try {
             await api.deleteProducto(productoId);
+            showToast('Producto eliminado correctamente', 'success');
         } catch (error) {
             console.error('Error eliminando producto:', error);
             alert('Error al eliminar el producto');
         }
+        cerrarModal();
+        await loadProductos(); // Recargar la lista
     }
-    cerrarModal();
-    await loadProductos(); // Recargar la lista
 }
 
 // Función para cerrar el modal
@@ -569,6 +572,7 @@ async function guardarExtraccion() {
 
     try {
         await api.createExtraccion(data);
+        showToast('Extracción guardada correctamente', 'success');
         cerrarModal();
         await loadExtracciones();
     } catch (error) {
@@ -588,8 +592,8 @@ async function eliminarExtraccion(event) {
         }
         try {
             await api.deleteExtraccion(extraccionId, data);
+            showToast('Extracción eliminada correctamente', 'success');
             await loadExtracciones(); // Recargar la lista
-            alert('Extracción eliminada correctamente');
         } catch (error) {
             console.error('Error eliminando extracción:', error);
             alert('Error al eliminar la extracción: ' + (error.message || 'Intente nuevamente'));
@@ -611,11 +615,15 @@ function agregarProductoAExtraccion() {
         alert('Seleccione un producto y una cantidad válida');
         return;
     }
-
     const producto = todosProductos.find(p => p.id === productoId);
 
     // Verificar si ya existe
     const existeIndex = productosParaExtraccion.findIndex(p => p.producto_id === productoId);
+
+    if (cantidad > producto.stock) {
+        showToast('Stock insuficiente, actual: ' + productoAgregar.stock, 'error');
+        return;
+    }
 
     if (existeIndex >= 0) {
         // Actualizar cantidad si ya existe
@@ -840,7 +848,6 @@ function agregarProductoAIngreso() {
 
     const producto = todosProductos.find(p => p.id === productoId);
 
-    // Verificar si ya existe
     const existeIndex = productosParaIngreso.findIndex(p => p.producto_id === productoId);
 
     if (existeIndex >= 0) {
@@ -873,7 +880,7 @@ async function guardarIngreso() {
 
     try {
         await api.createIngreso(data);
-
+        showToast('Ingreso guardado correctamente', 'success');
         cerrarModal();
         await loadIngresos();
     } catch (error) {
@@ -891,7 +898,7 @@ async function eliminarIngreso() {
         }
         try {
             await api.deleteIngreso(id, data);
-            alert('Ingreso eliminada correctamente');
+            showToast('Ingreso eliminado correctamente', 'success');
         } catch (error) {
             console.error('Error eliminando ingreso:', error);
             alert('Error al eliminar el ingreso: ' + (error.message || 'Intente nuevamente'));
@@ -1114,3 +1121,36 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+/**
+ * Muestra un toast de notificación
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de toast (success, error, warning, info)
+ * @param {number} duration - Duración en milisegundos (opcional, default: 3000)
+ */
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    toast.innerHTML = `
+    <span>${message}</span>
+    <button class="toast-close">&times;</button>
+  `;
+
+    container.appendChild(toast);
+
+    // Cerrar al hacer click en el botón
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.remove();
+    });
+
+    // Cierre automático
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    return toast;
+}
