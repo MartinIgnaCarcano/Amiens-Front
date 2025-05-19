@@ -1,5 +1,5 @@
-const API_URL = 'http://localhost:5000'; // Cambia esto por la URL de tu API si es diferente
-
+const API_URL = 'https://amiens-back-1.onrender.com'; 
+//const API_URL = 'http://localhost:5000'; 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return {
