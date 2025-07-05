@@ -378,6 +378,8 @@ tr {
     border-radius: 8px;
     width: 50%;
     max-width: 500px;
+    height: fit-content;
+    max-height: 80vh;
     color: #333333;
     /* Texto más oscuro */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -506,7 +508,65 @@ tr {
     justify-content: space-between;
     gap: 10px;
 }
+.table-modal-extraccion{
+    margin-top: 5px;
+    overflow-x: hidden;
+    height: fit-content;
+    max-height: 250px;
+    overflow-y: scroll;
+}
+/* Estilos para los iconos SVG en botones */
+.btn-eliminar-producto svg,
+.btn-eliminar-producto-ingreso svg,
+.eliminar-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: #e74c3c;
+    fill: none;
+}
 
+.btn-editar-cantidad svg,
+.btn-editar-cantidad-ingreso svg {
+    width: 16px;
+    height: 16px;
+    fill: #3498db;
+}
+
+
+/* Centrar iconos en botones */
+.btn-eliminar-producto,
+.btn-eliminar-producto-ingreso,
+.btn-editar-cantidad,
+.btn-editar-cantidad-ingreso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    height: 35px;
+    padding: 8px 12px;
+    margin: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.btn-editar-cantidad,
+.btn-editar-cantidad-ingreso{
+    margin-top: 10px;
+}
+
+.btn-eliminar-producto:hover,
+.btn-eliminar-producto-ingreso:hover {
+    background-color: #ffebee;
+    border-color: #e74c3c;
+}
+
+.btn-editar-cantidad:hover,
+.btn-editar-cantidad-ingreso:hover {
+    background-color: #e3f2fd;
+    border-color: #3498db;
+}
 /*-------------------------*/
 /* INGRESOS */
 /*-------------------------*/
@@ -640,6 +700,10 @@ tr {
         display: none;
     }
 
+    .table-modal-extraccion{
+        max-height: 350px;
+    }
+
     #productos-tab,
     #extracciones-table {
         max-width: 100%;
@@ -669,6 +733,8 @@ tr {
 
     .modal-content {
         width: 70vw;
+        height: fit-content;
+        max-height: 90vh;
     }
 
     #extraccion-descripcion-container{

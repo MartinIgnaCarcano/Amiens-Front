@@ -39,7 +39,7 @@ async function isLoggedIn() {
 }
 
 async function login() {
-    const username = document.getElementById('username').value;
+    const username = document.getElementById('username').value.toLowerCase();
     const password = document.getElementById('password').value;
     const errorMessage = document.getElementById('error-message');
     const error = document.getElementById('error-text');
@@ -306,7 +306,15 @@ function mostrarFormularioProducto(producto = null) {
 async function guardarProducto(event) {
     event.preventDefault();
     let productoId = document.getElementById('producto-id').value;
-    deshabilitarBotonesModal('producto-modal');
+    const btnGuardar = event.target.querySelector('button[type="submit"]');
+    
+    // Deshabilitar botón y cambiar apariencia
+    btnGuardar.disabled = true;
+    btnGuardar.style.backgroundColor = '#ccc';
+    btnGuardar.style.cursor = 'not-allowed';
+    btnGuardar.style.opacity = '0.6';
+    btnGuardar.textContent = 'Guardando...';
+    
     try {
         if (productoId) {
             const productoData = {
@@ -335,7 +343,12 @@ async function guardarProducto(event) {
         console.error('Error guardando producto:', error);
         showToast('Error al guardar el producto', 'error');
     } finally {
-        habilitarBotonesModal('producto-modal');
+        // Rehabilitar botón y restaurar apariencia
+        btnGuardar.disabled = false;
+        btnGuardar.style.backgroundColor = '';
+        btnGuardar.style.cursor = 'pointer';
+        btnGuardar.style.opacity = '1';
+        btnGuardar.textContent = 'Guardar';
     }
 }
 
@@ -396,6 +409,11 @@ function filtrarExtracciones() {
         // Filtro por texto en descripción
         const coincideTexto = extraccion.descripcion.toLowerCase().includes(termino);
 
+        // Filtro por usuario
+        const usuario = usuarios.find(u => u.id == extraccion.usuario_id);
+        const nombreUsuario = usuario ? usuario.username.toLowerCase() : '';
+        const coincideUsuario = nombreUsuario.includes(termino);
+
         // Filtro por fecha (si el término es numérico)
         const esNumero = !isNaN(termino) && termino !== '';
         const fechaExtraccion = new Date(extraccion.fecha);
@@ -423,7 +441,7 @@ function filtrarExtracciones() {
                 fechaExtraccion.getFullYear() === hoy.getFullYear();
         }
 
-        return (coincideTexto || (esNumero && coincideFechaNumero)) && coincideRangoFecha;
+        return (coincideTexto || coincideUsuario || (esNumero && coincideFechaNumero)) && coincideRangoFecha;
     });
 
     renderizarExtracciones(filtradas);
@@ -506,8 +524,12 @@ function renderizarProductosEnExtraccion() {
             ? '' // Si estás editando, no mostramos acciones
             : `
                 <td>
-                    <button class="btn-eliminar-producto" data-id="${item.producto_id}">Eliminar</button>
-                    <button class="btn-editar-cantidad" data-id="${item.producto_id}">Editar</button>
+                    <button class="btn-eliminar-producto" data-id="${item.producto_id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    <button class="btn-editar-cantidad" data-id="${item.producto_id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21,12a1,1,0,0,0-1,1v6a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4h6a1,1,0,0,0,0-2H5A3,3,0,0,0,2,5V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V13A1,1,0,0,0,21,12ZM6,12.76V17a1,1,0,0,0,1,1h4.24a1,1,0,0,0,.71-.29l6.92-6.93h0L21.71,8a1,1,0,0,0,0-1.42L17.47,2.29a1,1,0,0,0-1.42,0L13.23,5.12h0L6.29,12.05A1,1,0,0,0,6,12.76ZM16.76,4.41l2.83,2.83L18.17,8.66,15.34,5.83ZM8,13.17l5.93-5.93,2.83,2.83L10.83,16H8Z"></path></svg>
+                    </button>
                 </td>
             `;
 
@@ -551,6 +573,7 @@ function renderizarProductosEnExtraccion() {
 // Guardar extracción
 async function guardarExtraccion() {
     const descripcion = document.getElementById('extraccion-descripcion').value;
+    const btnGuardar = document.getElementById('guardar-extraccion');
 
     if (!descripcion) {
         alert('Por favor ingrese una descripción');
@@ -561,6 +584,13 @@ async function guardarExtraccion() {
         alert('Debe agregar al menos un producto');
         return;
     }
+
+    // Deshabilitar botón y cambiar apariencia
+    btnGuardar.disabled = true;
+    btnGuardar.style.backgroundColor = '#ccc';
+    btnGuardar.style.cursor = 'not-allowed';
+    btnGuardar.style.opacity = '0.6';
+    btnGuardar.textContent = 'Guardando...';
 
     const data = {
         descripcion,
@@ -578,6 +608,13 @@ async function guardarExtraccion() {
     } catch (error) {
         console.error('Error guardando extracción:', error);
         alert('Error al guardar la extracción: ' + (error.message || 'Verifique los datos'));
+    } finally {
+        // Rehabilitar botón y restaurar apariencia
+        btnGuardar.disabled = false;
+        btnGuardar.style.backgroundColor = '';
+        btnGuardar.style.cursor = 'pointer';
+        btnGuardar.style.opacity = '1';
+        btnGuardar.textContent = 'Guardar';
     }
 }
 
@@ -715,6 +752,11 @@ function filtrarIngresos() {
     const hoy = new Date();
 
     const filtradas = todosIngresos.filter(ingreso => {
+        // Filtro por usuario
+        const usuario = usuarios.find(u => u.id == ingreso.usuario_id);
+        const nombreUsuario = usuario ? usuario.username.toLowerCase() : '';
+        const coincideUsuario = nombreUsuario.includes(termino);
+
         // Filtro por fecha (si el término es numérico)
         const esNumero = !isNaN(termino) && termino !== '';
         const fechaIngreso = new Date(ingreso.fecha);
@@ -742,7 +784,7 @@ function filtrarIngresos() {
                 fechaIngreso.getFullYear() === hoy.getFullYear();
         }
 
-        return (esNumero ? coincideFechaNumero : true) && coincideRangoFecha;
+        return (coincideUsuario || (esNumero ? coincideFechaNumero : true)) && coincideRangoFecha;
     });
 
     renderizarIngresos(filtradas);
@@ -796,8 +838,12 @@ function renderizarProductosEnIngreso() {
             ? '' // Si estás editando, no mostramos acciones
             : `
                 <td>
-                    <button class="btn-eliminar-producto-ingreso" data-id="${item.producto_id}">Eliminar</button>
-                    <button class="btn-editar-cantidad-ingreso" data-id="${item.producto_id}">Editar</button>
+                    <button class="btn-eliminar-producto-ingreso" data-id="${item.producto_id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    <button class="btn-editar-cantidad-ingreso" data-id="${item.producto_id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21,12a1,1,0,0,0-1,1v6a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4h6a1,1,0,0,0,0-2H5A3,3,0,0,0,2,5V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V13A1,1,0,0,0,21,12ZM6,12.76V17a1,1,0,0,0,1,1h4.24a1,1,0,0,0,.71-.29l6.92-6.93h0L21.71,8a1,1,0,0,0,0-1.42L17.47,2.29a1,1,0,0,0-1.42,0L13.23,5.12h0L6.29,12.05A1,1,0,0,0,6,12.76ZM16.76,4.41l2.83,2.83L18.17,8.66,15.34,5.83ZM8,13.17l5.93-5.93,2.83,2.83L10.83,16H8Z"></path></svg>
+                    </button>
                 </td>
             `;
 
@@ -869,10 +915,19 @@ function agregarProductoAIngreso() {
 }
 
 async function guardarIngreso() {
+    const btnGuardar = document.getElementById('guardar-ingreso');
+    
     if (productosParaIngreso.length === 0) {
         alert('Agregue al menos un producto');
         return;
     }
+
+    // Deshabilitar botón y cambiar apariencia
+    btnGuardar.disabled = true;
+    btnGuardar.style.backgroundColor = '#ccc';
+    btnGuardar.style.cursor = 'not-allowed';
+    btnGuardar.style.opacity = '0.6';
+    btnGuardar.textContent = 'Guardando...';
 
     const data = {
         detalles: productosParaIngreso
@@ -885,24 +940,47 @@ async function guardarIngreso() {
         await loadIngresos();
     } catch (error) {
         alert('Error al guardar ingreso');
+    } finally {
+        // Rehabilitar botón y restaurar apariencia
+        btnGuardar.disabled = false;
+        btnGuardar.style.backgroundColor = '';
+        btnGuardar.style.cursor = 'pointer';
+        btnGuardar.style.opacity = '1';
+        btnGuardar.textContent = 'Guardar';
     }
 }
 
 async function eliminarIngreso() {
     const id = document.getElementById('ingreso-id').value;
+    const btnEliminar = document.getElementById('btn-eliminar-ingreso');
+    
     if (confirm('¿Está seguro de que desea eliminar este ingreso?')) {
         if (confirm('¿Quiere restar los productos al stock?')) {
             data = { 'devolver': 1 };
         } else {
             data = { 'devolver': 0 };
         }
+        
+        // Deshabilitar botón y cambiar apariencia
+        btnEliminar.disabled = true;
+        btnEliminar.style.backgroundColor = '#ccc';
+        btnEliminar.style.cursor = 'not-allowed';
+        btnEliminar.style.opacity = '0.6';
+        
         try {
             await api.deleteIngreso(id, data);
             showToast('Ingreso eliminado correctamente', 'success');
         } catch (error) {
             console.error('Error eliminando ingreso:', error);
             alert('Error al eliminar el ingreso: ' + (error.message || 'Intente nuevamente'));
+        } finally {
+            // Rehabilitar botón y restaurar apariencia
+            btnEliminar.disabled = false;
+            btnEliminar.style.backgroundColor = '';
+            btnEliminar.style.cursor = 'pointer';
+            btnEliminar.style.opacity = '1';
         }
+        
         await loadIngresos();
         cerrarModal();
     }
