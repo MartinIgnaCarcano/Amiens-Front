@@ -574,6 +574,10 @@ tr {
 
 .table-modal-ingreso {
     margin-top: 20px;
+    overflow-x: hidden;
+    height: fit-content;
+    max-height: 250px;
+    overflow-y: scroll;
 }
 
 #ingresos-table {
