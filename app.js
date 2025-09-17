@@ -391,6 +391,7 @@ async function loadExtracciones() {
     mostrarSpinner();
     try {
         todasExtracciones = await api.fetchExtracciones();
+        todasExtracciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         usuarios = await api.getUsuarios();
         renderizarExtracciones(todasExtracciones);
     } catch (error) {
@@ -715,6 +716,7 @@ async function loadIngresos() {
     mostrarSpinner();
     try {
         todosIngresos = await api.fetchIngresos();
+        todosIngresos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         usuarios = await api.getUsuarios();
         renderizarIngresos(todosIngresos);
     } catch (error) {
