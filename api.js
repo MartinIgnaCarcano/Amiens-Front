@@ -1,5 +1,7 @@
-const API_URL = 'https://amiens-back-1.onrender.com'; 
-//const API_URL = 'http://localhost:5000'; 
+// Cuando está en producción (Vercel), las rutas /api/... están en el mismo dominio.
+// En desarrollo local con `vercel dev` también funciona igual.
+const API_URL = '';
+
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return {
@@ -10,19 +12,19 @@ const getAuthHeaders = () => {
 
 async function handleApiResponse(response) {
     const data = await response.json();
-    
-    if (data.error === "El token ha expirado") {
+
+    if (data.error === 'El token ha expirado') {
         showToast(data.mensaje || 'La sesión ha expirado', 'error');
         cerrarSesion();
-        throw new Error('Token expirado'); // Para detener la ejecución
+        throw new Error('Token expirado');
     }
-    
+
     if (!response.ok) {
-        throw new Error(data.message || 'Error en la solicitud');
+        throw new Error(data.error || data.message || 'Error en la solicitud');
     }
-    
+
     return data;
-};
+}
 
 const api = {
 
@@ -30,13 +32,10 @@ const api = {
         try {
             const token = localStorage.getItem('token');
             if (!token) return false;
-
-            const response = await fetch(`${API_URL}/islogged`, {
+            const response = await fetch(`${API_URL}/api/auth/islogged`, {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
-            console.log('Response from /islogged:', response);
-
             return response.ok;
         } catch (error) {
             console.error('Error verifying token:', error);
@@ -46,185 +45,112 @@ const api = {
 
     login: async (username, password) => {
         try {
-            const response = await fetch(`${API_URL}/login`, {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-
-            if (!response.ok) {
-                throw new Error('Credenciales incorrectas');
-            } else {
-                const data = await response.json();
-                localStorage.setItem('token', data.access_token); // Almacena el token en localStorage
-                return data;
-            }
-            // Podés almacenar el ID en localStorage si lo necesitás
-            // localStorage.setItem('usuario_id', data.usuario_id);
+            if (!response.ok) throw new Error('Credenciales incorrectas');
+            const data = await response.json();
+            localStorage.setItem('token', data.access_token);
+            return data;
         } catch (error) {
             console.error('Error al iniciar sesión:', error.message);
         }
     },
 
-    // Funciones de productos (existente)
     fetchProductos: async () => {
-        try {
-            const response = await fetch(`${API_URL}/productos`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error fetching productos:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/productos`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        return await handleApiResponse(response);
     },
 
     createProducto: async (data) => {
-        try {
-            const response = await fetch(`${API_URL}/productos`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error creating producto:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/productos`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
     updateProducto: async (id, data) => {
-        try {
-            const response = await fetch(`${API_URL}/productos/${id}`, {
-                method: 'PATCH',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error updating producto:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/productos/${id}`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
     deleteProducto: async (id) => {
-        try {
-            const response = await fetch(`${API_URL}/productos/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders()
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error deleting producto:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/productos/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        return await handleApiResponse(response);
     },
 
-    // Nuevas funciones para extracciones
     fetchExtracciones: async () => {
-        try {
-            const response = await fetch(`${API_URL}/extracciones?_embed=detalles`,
-                {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                }
-            );
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error fetching extracciones:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/extracciones`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        return await handleApiResponse(response);
     },
 
     createExtraccion: async (data) => {
-        try {
-            const response = await fetch(`${API_URL}/extracciones`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error creating extraccion:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/extracciones`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
     deleteExtraccion: async (id, data = {}) => {
-        try {
-            const response = await fetch(`${API_URL}/extracciones/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error deleting extraccion:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/extracciones/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
-    // Funciones para ingresos
     fetchIngresos: async () => {
-        try {
-            const response = await fetch(`${API_URL}/ingresos`,
-                {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                }
-            );
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error fetching ingresos:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/ingresos`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        return await handleApiResponse(response);
     },
 
     createIngreso: async (data) => {
-        try {
-            const response = await fetch(`${API_URL}/ingresos`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error creating ingreso:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/ingresos`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
     deleteIngreso: async (id, data) => {
-        try {
-            const response = await fetch(`${API_URL}/ingresos/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(data)
-            });
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error deleting ingreso:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/ingresos/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return await handleApiResponse(response);
     },
 
     getUsuarios: async () => {
-        try {
-            const response = await fetch(`${API_URL}/usuarios`,
-                {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                }
-            );
-            return await handleApiResponse(response);
-        } catch (error) {
-            console.error('Error fetching usuarios:', error);
-            throw error;
-        }
+        const response = await fetch(`${API_URL}/api/auth/usuarios`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        return await handleApiResponse(response);
     }
 };
 
@@ -234,7 +160,7 @@ window.cerrarSesion = () => {
     boton.textContent = 'Iniciar sesión';
     boton.style.cursor = 'pointer';
     boton.style.backgroundColor = '#3498db';
-    localStorage.removeItem('token')
+    localStorage.removeItem('token');
     document.getElementById('login-form').style.display = 'flex';
     document.getElementById('main-container').style.display = 'none';
     document.getElementById('username').value = '';
@@ -242,5 +168,3 @@ window.cerrarSesion = () => {
 };
 
 window.api = api;
-
-
